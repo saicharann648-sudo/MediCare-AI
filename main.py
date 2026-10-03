@@ -53,12 +53,23 @@ except (ImportError, Exception):
 APP_TITLE = "MediCare Hospital Management System"
 APP_VERSION = "v2.5 Pro Enterprise"
 
-if os.environ.get("VERCEL"):
+_curr_dir = os.path.dirname(os.path.abspath(__file__))
+IS_SERVERLESS = bool(
+    os.environ.get("VERCEL") or 
+    os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or 
+    os.environ.get("NOW_REGION") or
+    not os.access(_curr_dir, os.W_OK)
+)
+
+if IS_SERVERLESS:
     DB_NAME = "/tmp/hospital.db"
-    _root_db = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hospital.db")
+    _root_db = os.path.join(_curr_dir, "hospital.db")
     if os.path.exists(_root_db) and not os.path.exists(DB_NAME):
         import shutil
-        shutil.copy2(_root_db, DB_NAME)
+        try:
+            shutil.copy2(_root_db, DB_NAME)
+        except Exception:
+            pass
 else:
     DB_NAME = "hospital.db"
 
@@ -727,13 +738,19 @@ class PDFReportGenerator:
 
     @staticmethod
     def get_output_dirs() -> Tuple[str, str]:
-        if os.environ.get("VERCEL"):
+        _curr_dir = os.path.dirname(os.path.abspath(__file__))
+        is_serverless = bool(
+            os.environ.get("VERCEL") or 
+            os.environ.get("AWS_LAMBDA_FUNCTION_NAME") or 
+            os.environ.get("NOW_REGION") or
+            not os.access(_curr_dir, os.W_OK)
+        )
+        if is_serverless:
             inv_dir = "/tmp/invoices"
             rx_dir = "/tmp/prescriptions"
         else:
-            base_dir = os.path.dirname(os.path.abspath(__file__))
-            inv_dir = os.path.join(base_dir, "invoices")
-            rx_dir = os.path.join(base_dir, "prescriptions")
+            inv_dir = os.path.join(_curr_dir, "invoices")
+            rx_dir = os.path.join(_curr_dir, "prescriptions")
         os.makedirs(inv_dir, exist_ok=True)
         os.makedirs(rx_dir, exist_ok=True)
         return inv_dir, rx_dir
