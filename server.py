@@ -15,12 +15,31 @@ Modeled after award-winning Behance UI/UX case studies:
 import os
 import json
 import datetime
+import urllib.parse
 from flask import Flask, request, jsonify, render_template_string, send_file, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from main import DatabaseManager, PDFReportGenerator, DEFAULT_CURRENCY
 
 app = Flask(__name__)
 app.secret_key = "medicare_ai_clinical_os_super_secret_key_2026"
+
+class VercelPathMiddleware:
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        qs_raw = environ.get('QUERY_STRING', '')
+        if '__vercel_path' in qs_raw:
+            qs = urllib.parse.parse_qs(qs_raw, keep_blank_values=True)
+            if '__vercel_path' in qs:
+                vp = qs.pop('__vercel_path')[0]
+                environ['QUERY_STRING'] = urllib.parse.urlencode([(k, v) for k, vs in qs.items() for v in vs])
+                environ['PATH_INFO'] = '/' + vp.lstrip('/')
+                return self.wsgi_app(environ, start_response)
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPathMiddleware(app.wsgi_app)
+
 try:
     db = DatabaseManager()
 except Exception as e:
@@ -2646,15 +2665,9 @@ AUTH_USERS = {
     }
 }
 
-@app.before_request
-
-def check_debug():
-    if request.args.get('dump_env') == '1':
-        clean = {k: str(v) for k, v in request.environ.items() if not k.startswith(('wsgi.', 'werkzeug.'))}
-        return jsonify(clean)
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
 
     if request.method == "POST":
         username = request.form.get("username", "").strip().lower()
