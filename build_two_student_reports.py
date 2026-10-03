@@ -78,13 +78,14 @@ class StudentNumberedCanvas(canvas.Canvas):
         # Footer text - Specifically identifies this candidate
         self.setFont('Helvetica-Bold', 8)
         self.setFillColor(colors.HexColor('#0f172a'))
-        self.drawString(40, 30, f"Candidate: {self.student_name} (Roll No: {self.student_roll})")
+        self.drawString(40, 30, f"Candidate: {self.student_name} (Class Roll No: {self.student_roll})")
         self.setFont('Helvetica', 8)
         self.setFillColor(colors.HexColor('#64748b'))
-        self.drawString(275, 30, f"| Partner: {self.partner_name} ({self.partner_roll}) | Class 12 A")
+        self.drawString(290, 30, f"| Partner: {self.partner_name} (Class Roll No: {self.partner_roll}) | Class 12 A")
         self.setFont('Helvetica-Bold', 8)
         self.setFillColor(colors.HexColor('#0d9488'))
         self.drawRightString(555, 30, f"Page {self._pageNumber} of {page_count}")
+
         self.restoreState()
 
 
@@ -225,7 +226,7 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
             Paragraph("<b>PROJECT GUIDANCE & SUPERVISION:</b>", ParagraphStyle('SupH', fontName='Helvetica-Bold', fontSize=9.5, leading=13, textColor=c_indigo))
         ],
         [
-            Paragraph(f"Candidate Name: <b>{student_name}</b><br/>CBSE Roll No: <b>{student_roll}</b><br/>Class & Section: <b>Class XII A (Science)</b><br/><br/>Project Collaborator: <b>{partner_name}</b><br/>CBSE Roll No: <b>{partner_roll}</b><br/>Class: <b>Class XII A (Science)</b>", body_style),
+            Paragraph(f"Candidate Name: <b>{student_name}</b><br/>Class Roll No: <b>{student_roll}</b><br/>Class & Section: <b>Class XII A (Science)</b><br/><br/>Project Collaborator: <b>{partner_name}</b><br/>Class Roll No: <b>{partner_roll}</b><br/>Class: <b>Class XII A (Science)</b>", body_style),
             Paragraph("<b>PGT COMPUTER SCIENCE</b><br/>Department of Computer Science<br/>PM SHRI Kendriya Vidyalaya ASC Centre<br/>Bengaluru, Karnataka - 560047", body_style)
         ]
     ]
@@ -253,9 +254,9 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
     cert_text = (
         f"This is to certify that the investigatory project entitled <b>'MediCare AI: Smart Hospital "
         f"and Doctor Appointment Management System'</b> has been successfully formulated, programmed, and submitted by "
-        f"<b>{student_name} (Roll No: {student_roll})</b>, a bonafide student of <b>Class XII - Section A</b> at "
+        f"<b>{student_name} (Class Roll No: {student_roll})</b>, a bonafide student of <b>Class XII - Section A</b> at "
         f"<b>PM SHRI KENDRIYA VIDYALAYA ASC CENTRE, BENGALURU</b>, in collaborative partnership with "
-        f"<b>{partner_name} (Roll No: {partner_roll})</b>, in partial fulfillment of the practical evaluation for the "
+        f"<b>{partner_name} (Class Roll No: {partner_roll})</b>, in partial fulfillment of the practical evaluation for the "
         f"<b>All India Senior School Certificate Examination (AISSCE)</b> in <b>Computer Science (Subject Code: 083)</b> "
         f"conducted by the <b>Central Board of Secondary Education (CBSE), New Delhi</b> during the academic session <b>2025 – 2026</b>.<br/><br/>"
         f"The candidate has demonstrated exceptional technical aptitude in relational schema engineering using SQLite3, "
@@ -266,7 +267,7 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
     story.append(Spacer(1, 20))
 
     cand_box = [
-        [Paragraph("<b>Candidate Name</b>", table_header), Paragraph("<b>Roll Number</b>", table_header), Paragraph("<b>Class & Section</b>", table_header), Paragraph("<b>Academic Institution</b>", table_header)],
+        [Paragraph("<b>Candidate Name</b>", table_header), Paragraph("<b>Class Roll No</b>", table_header), Paragraph("<b>Class & Section</b>", table_header), Paragraph("<b>Academic Institution</b>", table_header)],
         [Paragraph(f"<b>{student_name}</b>", table_cell), Paragraph(f"<b>{student_roll}</b>", table_cell), Paragraph("Class XII - Section A", table_cell), Paragraph("PM SHRI KV ASC Centre", table_cell)],
         [Paragraph(f"{partner_name} (Partner)", table_cell), Paragraph(f"{partner_roll}", table_cell), Paragraph("Class XII - Section A", table_cell), Paragraph("PM SHRI KV ASC Centre", table_cell)],
     ]
@@ -305,13 +306,13 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
     story.append(Spacer(1, 8))
 
     decl_text = (
-        f"I, <b>{student_name}</b>, bearing CBSE Roll No: <b>{student_roll}</b>, student of <b>Class XII - A</b> of "
+        f"I, <b>{student_name}</b>, bearing Class Roll No: <b>{student_roll}</b>, student of <b>Class XII - A</b> of "
         f"<b>PM SHRI KENDRIYA VIDYALAYA ASC CENTRE, BENGALURU</b>, hereby declare that the investigatory project entitled "
         f"<b>'MediCare AI: Smart Hospital & Doctor Appointment Management System'</b> is an authentic, original piece of work "
         f"executed by me under the continuous guidance of our PGT Computer Science teacher during the academic session 2025–2026.<br/><br/>"
         f"I affirm that all system modules—including the `DatabaseManager` relational SQLite persistence layer, "
         f"the CustomTkinter dual-engine user interface, the ReportLab automated PDF invoicing engine, and the Flask REST microservices—were "
-        f"designed, coded, and tested by me in collaboration with my project partner <b>{partner_name} (Roll No: {partner_roll})</b>.<br/><br/>"
+        f"designed, coded, and tested by me in collaboration with my project partner <b>{partner_name} (Class Roll No: {partner_roll})</b>.<br/><br/>"
         f"No portion of this software codebase or documentation report has been plagiarized or submitted to any other educational "
         f"board or institution for any certificate, degree, or examination credit."
     )
@@ -327,7 +328,7 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
     c_sig_data = [
         [
             Paragraph("Date: ________________________<br/>Place: <b>Bengaluru, Karnataka</b>", body_style),
-            Paragraph(f"Signature of Candidate: _______________________<br/><b>{student_name}</b><br/>CBSE Roll No: <b>{student_roll}</b><br/>Class XII - Section A (Science Stream)<br/>PM SHRI KV ASC Centre, Bengaluru", ParagraphStyle('CSig', parent=body_style, leading=14))
+            Paragraph(f"Signature of Candidate: _______________________<br/><b>{student_name}</b><br/>Class Roll No: <b>{student_roll}</b><br/>Class XII - Section A (Science Stream)<br/>PM SHRI KV ASC Centre, Bengaluru", ParagraphStyle('CSig', parent=body_style, leading=14))
         ]
     ]
     t_csig = Table(c_sig_data, colWidths=[230, 285])
@@ -355,7 +356,7 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
         f"I am deeply indebted to our respected <b>Teacher-in-Charge (PGT Computer Science)</b> for their invaluable mentorship, "
         f"scholarly advice, and constructive criticism throughout the design and debugging of our relational schema and Python code. "
         f"Their mastery of Object-Oriented Programming (OOP) and SQL optimization served as a continuous source of inspiration.<br/><br/>"
-        f"I also express sincere appreciation to my project partner <b>{partner_name} (Roll No: {partner_roll})</b> for our collaborative "
+        f"I also express sincere appreciation to my project partner <b>{partner_name} (Class Roll No: {partner_roll})</b> for our collaborative "
         f"teamwork, vibrant brainstorming sessions, and shared commitment to writing clean, maintainable, and bug-free code.<br/><br/>"
         f"Finally, I express my warmest love and gratitude to my <b>Parents and Family</b> for their moral encouragement and patience, "
         f"and to my classmates of <b>Class XII A</b> for their cooperative testing assistance."
@@ -363,8 +364,9 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
     story.append(Paragraph(ack_text, ParagraphStyle('AckP', parent=body_style, fontSize=9.5, leading=15.5)))
     story.append(Spacer(1, 100))
 
-    story.append(Paragraph(f"<b>{student_name}</b><br/>CBSE Roll No: <b>{student_roll}</b><br/>Class XII A (Science), Department of Computer Science<br/>PM SHRI KV ASC Centre, Bengaluru", ParagraphStyle('AckSign', parent=body_style, fontSize=9.5, leading=14, alignment=2)))
+    story.append(Paragraph(f"<b>{student_name}</b><br/>Class Roll No: <b>{student_roll}</b><br/>Class XII A (Science), Department of Computer Science<br/>PM SHRI KV ASC Centre, Bengaluru", ParagraphStyle('AckSign', parent=body_style, fontSize=9.5, leading=14, alignment=2)))
     story.append(PageBreak())
+
 
     # =========================================================================
     # PAGE 5: TABLE OF CONTENTS & EXECUTIVE SUMMARY
@@ -1285,7 +1287,8 @@ def generate_single_report(student_name, student_roll, partner_name, partner_rol
     # Team Credentials Box - Tailored for this student
     cred_data = [
         [Paragraph("<b>PROJECT INVESTIGATOR & SOFTWARE DEVELOPER</b>", ParagraphStyle('DevH', fontName='Helvetica-Bold', fontSize=9, leading=12, textColor=c_primary, alignment=1))],
-        [Paragraph(f"<b>{student_name}</b> (CBSE Roll No: <b>{student_roll}</b>) &nbsp;&nbsp;|&nbsp;&nbsp; In Collaboration with <b>{partner_name}</b> (Roll No: <b>{partner_roll}</b>)<br/><b>Class XII A (Science Stream)</b> &nbsp;•&nbsp; <b>PM SHRI KENDRIYA VIDYALAYA ASC CENTRE, BENGALURU</b>", ParagraphStyle('DevB', fontName='Helvetica', fontSize=8.5, leading=13, alignment=1))]
+        [Paragraph(f"<b>{student_name}</b> (Class Roll No: <b>{student_roll}</b>) &nbsp;&nbsp;|&nbsp;&nbsp; In Collaboration with <b>{partner_name}</b> (Class Roll No: <b>{partner_roll}</b>)<br/><b>Class XII A (Science Stream)</b> &nbsp;•&nbsp; <b>PM SHRI KENDRIYA VIDYALAYA ASC CENTRE, BENGALURU</b>", ParagraphStyle('DevB', fontName='Helvetica', fontSize=8.5, leading=13, alignment=1))]
+
     ]
     t_cred = Table(cred_data, colWidths=[515])
     t_cred.setStyle(TableStyle([
