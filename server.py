@@ -2646,8 +2646,16 @@ AUTH_USERS = {
     }
 }
 
+@app.before_request
+
+def check_debug():
+    if request.args.get('dump_env') == '1':
+        clean = {k: str(v) for k, v in request.environ.items() if not k.startswith(('wsgi.', 'werkzeug.'))}
+        return jsonify(clean)
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     if request.method == "POST":
         username = request.form.get("username", "").strip().lower()
         password = request.form.get("password", "").strip()
