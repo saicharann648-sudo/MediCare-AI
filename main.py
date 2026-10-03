@@ -21,15 +21,21 @@ from typing import List, Dict, Any, Optional, Tuple
 # --------------------------------------------------------------------------------------
 # 1. DEPENDENCY CHECKS & GRACEFUL IMPORTS
 # --------------------------------------------------------------------------------------
-USE_CUSTOMTKINTER = True
+USE_CUSTOMTKINTER = False
+TKINTER_AVAILABLE = False
 try:
     import customtkinter as ctk
     import tkinter as tk
     from tkinter import ttk, messagebox, filedialog
-except ImportError:
-    USE_CUSTOMTKINTER = False
-    import tkinter as tk
-    from tkinter import ttk, messagebox, filedialog
+    USE_CUSTOMTKINTER = True
+    TKINTER_AVAILABLE = True
+except (ImportError, Exception):
+    try:
+        import tkinter as tk
+        from tkinter import ttk, messagebox, filedialog
+        TKINTER_AVAILABLE = True
+    except (ImportError, Exception):
+        TKINTER_AVAILABLE = False
 
 REPORTLAB_AVAILABLE = True
 try:
@@ -40,13 +46,22 @@ try:
     )
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
-except ImportError:
+except (ImportError, Exception):
     REPORTLAB_AVAILABLE = False
 
 # Application Constants
 APP_TITLE = "MediCare Hospital Management System"
 APP_VERSION = "v2.5 Pro Enterprise"
-DB_NAME = "hospital.db"
+
+if os.environ.get("VERCEL"):
+    DB_NAME = "/tmp/hospital.db"
+    _root_db = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hospital.db")
+    if os.path.exists(_root_db) and not os.path.exists(DB_NAME):
+        import shutil
+        shutil.copy2(_root_db, DB_NAME)
+else:
+    DB_NAME = "hospital.db"
+
 DEFAULT_CURRENCY = "₹"  # Can be changed to '$' or other symbols
 
 # Color Palette Configuration (Modern Deep Slate & Medical Teal)
@@ -712,9 +727,13 @@ class PDFReportGenerator:
 
     @staticmethod
     def get_output_dirs() -> Tuple[str, str]:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        inv_dir = os.path.join(base_dir, "invoices")
-        rx_dir = os.path.join(base_dir, "prescriptions")
+        if os.environ.get("VERCEL"):
+            inv_dir = "/tmp/invoices"
+            rx_dir = "/tmp/prescriptions"
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            inv_dir = os.path.join(base_dir, "invoices")
+            rx_dir = os.path.join(base_dir, "prescriptions")
         os.makedirs(inv_dir, exist_ok=True)
         os.makedirs(rx_dir, exist_ok=True)
         return inv_dir, rx_dir
