@@ -9,13 +9,27 @@ if parent_dir not in sys.path:
 
 try:
     from server import app
+
+    class VercelPathMiddleware:
+        def __init__(self, wsgi_app):
+            self.wsgi_app = wsgi_app
+
+        def __call__(self, environ, start_response):
+            path = environ.get('PATH_INFO', '')
+            if path.startswith('/api/index'):
+                rest = path[len('/api/index'):]
+                environ['PATH_INFO'] = rest if rest else '/'
+            return self.wsgi_app(environ, start_response)
+
+    app.wsgi_app = VercelPathMiddleware(app.wsgi_app)
+
 except Exception as e:
     import traceback
     from flask import Flask
     app = Flask(__name__)
     err_trace = traceback.format_exc()
     print("Vercel Startup Exception:", err_trace)
-    
+
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def catch_all(path):
