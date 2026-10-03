@@ -1,5 +1,6 @@
 import sys
 import os
+import urllib.parse
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -16,6 +17,18 @@ try:
             self.wsgi_app = wsgi_app
 
         def __call__(self, environ, start_response):
+            # 1. Check for __vercel_path from vercel.json rewrite parameter
+            qs_raw = environ.get('QUERY_STRING', '')
+            if '__vercel_path' in qs_raw:
+                qs = urllib.parse.parse_qs(qs_raw, keep_blank_values=True)
+                if '__vercel_path' in qs:
+                    vp = qs.pop('__vercel_path')[0]
+                    # Restore remaining query parameters
+                    environ['QUERY_STRING'] = urllib.parse.urlencode([(k, v) for k, vs in qs.items() for v in vs])
+                    environ['PATH_INFO'] = '/' + vp.lstrip('/')
+                    return self.wsgi_app(environ, start_response)
+
+            # 2. Check for original URL headers from Vercel edge
             orig = (
                 environ.get('HTTP_X_NOW_ORIGINAL_URL') or
                 environ.get('HTTP_X_VERCEL_ORIGINAL_URL') or
@@ -30,13 +43,15 @@ try:
                     environ['QUERY_STRING'] = query_part
                 else:
                     environ['PATH_INFO'] = orig
-            else:
-                path = environ.get('PATH_INFO', '')
-                for prefix in ['/api/index.py', '/api/index']:
-                    if path.startswith(prefix):
-                        rest = path[len(prefix):]
-                        environ['PATH_INFO'] = rest if rest.startswith('/') else ('/' + rest if rest else '/')
-                        break
+                return self.wsgi_app(environ, start_response)
+
+            # 3. Fallback: normalize PATH_INFO
+            path = environ.get('PATH_INFO', '')
+            for prefix in ['/api/index.py', '/api/index']:
+                if path.startswith(prefix):
+                    rest = path[len(prefix):]
+                    environ['PATH_INFO'] = rest if rest.startswith('/') else ('/' + rest if rest else '/')
+                    break
             if not environ.get('PATH_INFO'):
                 environ['PATH_INFO'] = '/'
             return self.wsgi_app(environ, start_response)
