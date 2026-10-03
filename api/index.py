@@ -16,12 +16,27 @@ try:
             self.wsgi_app = wsgi_app
 
         def __call__(self, environ, start_response):
-            path = environ.get('PATH_INFO', '')
-            for prefix in ['/api/index.py', '/api/index']:
-                if path.startswith(prefix):
-                    rest = path[len(prefix):]
-                    environ['PATH_INFO'] = rest if rest.startswith('/') else ('/' + rest if rest else '/')
-                    break
+            orig = (
+                environ.get('HTTP_X_NOW_ORIGINAL_URL') or
+                environ.get('HTTP_X_VERCEL_ORIGINAL_URL') or
+                environ.get('HTTP_X_FORWARDED_PATH') or
+                environ.get('HTTP_X_FORWARDED_URI') or
+                environ.get('HTTP_X_ORIGINAL_URI')
+            )
+            if orig:
+                if '?' in orig:
+                    path_part, query_part = orig.split('?', 1)
+                    environ['PATH_INFO'] = path_part
+                    environ['QUERY_STRING'] = query_part
+                else:
+                    environ['PATH_INFO'] = orig
+            else:
+                path = environ.get('PATH_INFO', '')
+                for prefix in ['/api/index.py', '/api/index']:
+                    if path.startswith(prefix):
+                        rest = path[len(prefix):]
+                        environ['PATH_INFO'] = rest if rest.startswith('/') else ('/' + rest if rest else '/')
+                        break
             if not environ.get('PATH_INFO'):
                 environ['PATH_INFO'] = '/'
             return self.wsgi_app(environ, start_response)
