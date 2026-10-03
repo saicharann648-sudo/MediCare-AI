@@ -23,6 +23,15 @@ from typing import List, Dict, Any, Optional, Tuple
 # --------------------------------------------------------------------------------------
 USE_CUSTOMTKINTER = False
 TKINTER_AVAILABLE = False
+
+class _DummyWidget:
+    def __init__(self, *args, **kwargs): pass
+    def __call__(self, *args, **kwargs): return self
+    def __getattr__(self, name): return _DummyWidget()
+
+class _DummyModule:
+    def __getattr__(self, name): return _DummyWidget
+
 try:
     import customtkinter as ctk
     import tkinter as tk
@@ -36,6 +45,15 @@ except (ImportError, Exception):
         TKINTER_AVAILABLE = True
     except (ImportError, Exception):
         TKINTER_AVAILABLE = False
+
+if not USE_CUSTOMTKINTER:
+    ctk = _DummyModule()
+if not TKINTER_AVAILABLE:
+    tk = _DummyModule()
+    ttk = _DummyModule()
+    messagebox = _DummyModule()
+    filedialog = _DummyModule()
+
 
 REPORTLAB_AVAILABLE = True
 try:

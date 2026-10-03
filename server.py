@@ -21,8 +21,16 @@ from main import DatabaseManager, PDFReportGenerator, DEFAULT_CURRENCY
 
 app = Flask(__name__)
 app.secret_key = "medicare_ai_clinical_os_super_secret_key_2026"
-app.config["PERMANENT_SESSION_LIFETIME"] = datetime.timedelta(days=30)
-db = DatabaseManager()
+try:
+    db = DatabaseManager()
+except Exception as e:
+    print(f"Warning: DatabaseManager initial connection error: {e}")
+    try:
+        db = DatabaseManager("/tmp/hospital.db")
+    except Exception as e2:
+        print(f"Critical: Fallback DatabaseManager error: {e2}")
+        db = None
+
 
 AI_HEALTHCARE_TEMPLATE = """
 <!DOCTYPE html>
